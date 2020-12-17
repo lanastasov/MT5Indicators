@@ -14,15 +14,14 @@ double main_pivot, day_range, period_close, period_high, period_low, period_open
        M0, M1, M2, M3, M4, M5;
 datetime starting_time, ending_time;
 ENUM_TIMEFRAMES pivot_tf;
-string tf_text;
+string tf_text, pivot_choice;
 
 void Pivot_Points(
   datetime date_time, 
   string name, 
   PIVOT_METHODS p_Method, 
   PIVOT_TIMEFRAME p_TimeFrame, 
-  bool use_fibs, 
-  bool use_camarilla, 
+  PIVOT_CHOICE pivotChoice,
   bool show_SR_Pivots, 
   color SPivotColor, 
   color RPivotColor, 
@@ -39,6 +38,13 @@ void Pivot_Points(
     case 1: pivot_tf = PERIOD_MN1; tf_text = "Monthly"; break;
     case 2: pivot_tf = PERIOD_W1; tf_text = "Weekly"; break;
     case 3: pivot_tf = PERIOD_D1; tf_text = "Daily"; break;
+  }
+  
+  switch(pivotChoice)
+  {
+    case 1: pivot_choice = "standard"; break;
+    case 2: pivot_choice = "camarilla"; break;
+    case 3: pivot_choice = "fibonachi";  break;
   }
 
   period_close= iClose(Symbol(), pivot_tf, 1);
@@ -57,7 +63,7 @@ void Pivot_Points(
 
   day_range = period_high - period_low;
 
-  if(use_camarilla)
+  if(pivot_choice == "camarilla")
   {
     // -- Camarilla Pivots
     R1 = period_close + day_range*(1.1/12);
@@ -79,9 +85,8 @@ void Pivot_Points(
     SetPivotLine( "S3", starting_time, S3, ending_time, S3, SPivotColor, "S3 " + DoubleToString(S3,5), SR_PivotsLineStyle);
     SetPivotLine( "S4", starting_time, S4, ending_time, S4, SPivotColor, "S4 " + DoubleToString(S4,5), SR_PivotsLineStyle);
   }
-  else
-  {
-    if(use_fibs)
+  
+   if(pivot_choice == "fibonachi")
     {
       // -- Fibonachi Pivots
       R38  = day_range*0.382 + main_pivot;
@@ -91,7 +96,7 @@ void Pivot_Points(
       R138 = day_range*1.382 + main_pivot;
       R161 = day_range*1.618 + main_pivot;
       R200 = day_range*2.00 + main_pivot;
-
+   
       S38  = main_pivot - day_range*0.382;
       S61  = main_pivot - day_range*0.618;
       S78  = main_pivot - day_range*0.786;
@@ -99,7 +104,7 @@ void Pivot_Points(
       S138 = main_pivot - day_range*1.382;
       S161 = main_pivot - day_range*1.618;
       S200 = main_pivot - day_range*2.00;
-
+   
       SetPivotLine( "R38", starting_time, R38, ending_time, R38, RPivotColor, "R38 " + DoubleToString(R38,5), SR_PivotsLineStyle);
       SetPivotLine( "R61", starting_time, R61, ending_time, R61, RPivotColor, "R61 " + DoubleToString(R61,5), SR_PivotsLineStyle);
       SetPivotLine( "R78", starting_time, R78, ending_time, R78, RPivotColor, "R78 " + DoubleToString(R78,5), SR_PivotsLineStyle);
@@ -107,9 +112,9 @@ void Pivot_Points(
       SetPivotLine( "R138", starting_time, R138, ending_time, R138, RPivotColor, "R138 " + DoubleToString(R138,5), SR_PivotsLineStyle);
       SetPivotLine( "R161", starting_time, R161, ending_time, R161, RPivotColor, "R161 " + DoubleToString(R161,5), SR_PivotsLineStyle);
       SetPivotLine( "R200", starting_time, R200, ending_time, R200, RPivotColor, "R200 " + DoubleToString(R200,5), SR_PivotsLineStyle);
-
+   
       SetPivotLine( "Pivot", starting_time, main_pivot, ending_time, main_pivot, RPivotColor, "Pivot " + DoubleToString(main_pivot,5), SR_PivotsLineStyle);
-
+   
       SetPivotLine( "S38", starting_time, S38, ending_time, S38, SPivotColor, "S38 " + DoubleToString(S38,5), SR_PivotsLineStyle);
       SetPivotLine( "S61", starting_time, S61, ending_time, S61, SPivotColor, "S61 " + DoubleToString(S61,5), SR_PivotsLineStyle);
       SetPivotLine( "S78", starting_time, S78, ending_time, S78, SPivotColor, "S78 " + DoubleToString(S78,5), SR_PivotsLineStyle);
@@ -118,7 +123,8 @@ void Pivot_Points(
       SetPivotLine( "S161", starting_time, S161, ending_time, S161, SPivotColor, "S161 " + DoubleToString(S161,5), SR_PivotsLineStyle);
       SetPivotLine( "S200", starting_time, S200, ending_time, S200, SPivotColor, "S200 " + DoubleToString(S200,5), SR_PivotsLineStyle);
     }
-    else
+
+    if(pivot_choice == "standard")
     {
       // -- Standard Pivots
       R1 = 2*main_pivot - period_low;
@@ -156,8 +162,7 @@ void Pivot_Points(
         SetPivotLine( "M4", starting_time, M4, ending_time, M4, MidPivots_Color, "M4 " + DoubleToString(M4,5), MidPivots_LineStyle);
         SetPivotLine( "M5", starting_time, M5, ending_time, M5, MidPivots_Color, "M5 " + DoubleToString(M5,5), MidPivots_LineStyle);
       }
-    }
-  }
+    }  
 }
 
 void SetPivotLine(

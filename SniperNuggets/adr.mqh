@@ -204,7 +204,7 @@ void ADR_Maker(
       {
         SetMarkers(name + "High", adr_start,  adr_end, adr_high,  m_color, line_style, line_thickness, "ADR High: " + DoubleToString(adr_high, 5));
         SetMarkers(name + "Low", adr_start,  adr_end, adr_low,  m_color, line_style, line_thickness, "ADR Low: " + DoubleToString(adr_low, 5));
-        //SetADRStartLine( name + "Start", adr_start, m_color);
+        SetADRStartLine( name + "Start", adr_start, m_color);
       } 
     }
     else
@@ -289,5 +289,5 @@ void SetADRStartLine(
 {
   vline.Create(0, name, 0, starting_adr_time);
   vline.Color(colr);
-  vline.SetInteger(OBJPROP_STYLE, STYLE_DASHDOTDOT);  
+  vline.SetInteger(OBJPROP_STYLE, STYLE_DASHDOTDOT);
 }

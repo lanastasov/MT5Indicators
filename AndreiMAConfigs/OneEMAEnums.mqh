@@ -5,7 +5,7 @@
 
 enum TREND_TIMEFRAMES
 {
-   TREND_H1 = 4, // H1 Trend
+   TREND_H1 = 1, // H1 Trend
    TREND_H4 = 4, // H4 Trend
    TREND_H6 = 6, // H6 Trend
    TREND_H8 = 8, // H8 Trend
