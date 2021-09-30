@@ -17,7 +17,7 @@ bool DEBUG_CODE = false;
 //| ADR_Maker                                                              |
 //+------------------------------------------------------------------+
 
-void ADR_Maker(
+bool ADR_Maker(
     datetime date_time,
     string name,
     color m_color,
@@ -167,6 +167,8 @@ void ADR_Maker(
       line_thickness+=1;
       line_style = STYLE_SOLID;
       reached = "Yes";
+    }else{
+      reached = "No";
     }
     //---
     to_high_adr = to_high_adr/Point()/10;
@@ -202,18 +204,34 @@ void ADR_Maker(
       if(DEBUG_CODE) Comment(debug_post); else Comment(adr_post);
       if(draw_markers)
       {
-        SetMarkers(name + "High", adr_start,  adr_end, adr_high,  m_color, line_style, line_thickness, "ADR High: " + DoubleToString(adr_high, 5));
-        SetMarkers(name + "Low", adr_start,  adr_end, adr_low,  m_color, line_style, line_thickness, "ADR Low: " + DoubleToString(adr_low, 5));
-        SetADRStartLine( name + "Start", adr_start, m_color);
+        
+        ResetLastError();
+        if(!SetMarkers(name + "High", adr_start,  adr_end, adr_high,  m_color, line_style, line_thickness, "ADR High: " + DoubleToString(adr_high, 5))){
+            Print(__FUNCTION__, ": Failed to create adr high marker line ",GetLastError());
+            return(false);
+        }
+        
+        ResetLastError();
+        if(!SetMarkers(name + "Low", adr_start,  adr_end, adr_low,  m_color, line_style, line_thickness, "ADR Low: " + DoubleToString(adr_low, 5))){
+            Print(__FUNCTION__, ": Failed to create adr low marker line ",GetLastError());
+            return(false);
+        }
+        
+        ResetLastError();
+        if(!SetADRStartLine( name + "Start", adr_start, m_color)){
+            Print(__FUNCTION__, ": Failed to create adr marker line ",GetLastError());
+            return(false);
+        }
       } 
     }
     else
     {
       Comment("Please Refresh your Chart !!");
     }  
-    adr_post = ""; 
-    debug_post = "";
+    adr_post = "\n"; 
+    debug_post = "\n";
     //--
+    return(true);
   }
 //+------------------------------------------------------------------+
 
@@ -261,7 +279,7 @@ double x_weeks_range(int x_weeks)
   }
 
 //+------------------------------------------------------------------+
-void SetMarkers(
+bool SetMarkers(
   string name,
   datetime starting_adr_time, 
   datetime ending_adr_time,
@@ -271,23 +289,45 @@ void SetMarkers(
   int lwidth,
   string marker_text
 )
-{
-  line.Create(0, name , 0, starting_adr_time, price_high, ending_adr_time, price_high);
-  line.Color(colr);
-  line.SetInteger(OBJPROP_STYLE, lyn);
-  line.SetInteger(OBJPROP_WIDTH, lwidth);
-  line.Description(marker_text);
+{  
+  ResetLastError();
+   if(!ObjectDelete(0, name)){
+      Print(__FUNCTION__, ": Failed to delete old adr marker line ",GetLastError());
+      return(false);
+   }
+  
+   ResetLastError();
+   if(!line.Create(0, name , 0, starting_adr_time, price_high, ending_adr_time, price_high)){
+      Print(__FUNCTION__, ": Failed to create adr marker line ",GetLastError());
+      return(false);
+   }
+   line.Color(colr);
+   line.SetInteger(OBJPROP_STYLE, lyn);
+   line.SetInteger(OBJPROP_WIDTH, lwidth);
+   line.Description(marker_text);
+   return(true);
 }
 
 //+------------------------------------------------------------------+
 
-void SetADRStartLine(
+bool SetADRStartLine(
   string name,
   datetime starting_adr_time,
   color colr
 )
 {
-  vline.Create(0, name, 0, starting_adr_time);
-  vline.Color(colr);
-  vline.SetInteger(OBJPROP_STYLE, STYLE_DASHDOTDOT);
+   ResetLastError();
+   if(!ObjectDelete(0, name)){
+      Print(__FUNCTION__, ": Failed to delete old adr start line ",GetLastError());
+      return(false);
+   }
+  
+   ResetLastError();
+   if(!vline.Create(0, name, 0, starting_adr_time)){
+      Print(__FUNCTION__, ": Failed to create adr start line ",GetLastError());
+      return(false);
+   }
+   vline.Color(colr);
+   vline.SetInteger(OBJPROP_STYLE, STYLE_DASHDOTDOT);
+   return(true);
 }
